@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="title">
+  <title id="title">Compact black coffee maker</title>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1b2c21"/>
+      <stop offset="1" stop-color="#080b09"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#37453b"/>
+      <stop offset="1" stop-color="#101612"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="48" fill="url(#background)"/>
+  <circle cx="320" cy="320" r="220" fill="#72d395" opacity=".08"/>
+  <path d="M208 164h224q21 0 21 22v71H187v-71q0-22 21-22Z" fill="#72d395"/>
+  <path d="M190 252h260v218q0 34-34 34H224q-34 0-34-34V252Z" fill="url(#body)" stroke="#bce9c9" stroke-width="9"/>
+  <rect x="231" y="282" width="178" height="90" rx="16" fill="#0b110d" stroke="#72d395" stroke-width="7"/>
+  <path d="M260 320q30-38 60 0t60 0" fill="none" stroke="#8be2a9" stroke-width="9" stroke-linecap="round"/>
+  <path d="M258 396h124v59H258z" fill="#15221a" stroke="#72d395" stroke-width="7"/>
+  <path d="M279 410h82v31h-82z" fill="#8e5632"/>
+  <path d="M250 494h140" stroke="#d9f7e1" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="414" cy="413" r="9" fill="#72d395"/>
+  <text x="320" y="568" fill="#eaffef" font-family="Arial,sans-serif" font-size="23" font-weight="700" letter-spacing="4" text-anchor="middle">BREWMATE</text>
+</svg>

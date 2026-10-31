@@ -1,11 +1,14 @@
-import { CanActivateFn } from '@angular/router';
-import { SellerService } from './services/seller.service';
-export const authGuard: CanActivateFn = (route, state) => {
-  let val = localStorage.getItem('idss');
-  let emailval = localStorage.getItem('email');
-   if(val=='true'){
-       return true;
-   }
-   else if(emailval!=null) return true;
-   else return false;
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+
+export const authGuard: CanActivateFn = (_route, state) => {
+  const seller = localStorage.getItem('selerdata');
+  const token = localStorage.getItem('authToken');
+  if (token && seller) {
+    return true;
+  }
+
+  return inject(Router).createUrlTree(['/sellerAuth'], {
+    queryParams: { returnUrl: state.url },
+  });
 };

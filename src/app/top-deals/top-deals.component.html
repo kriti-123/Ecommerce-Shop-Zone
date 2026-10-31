@@ -1,0 +1,44 @@
+<section class="top-deal-container" aria-labelledby="top-deals-title">
+  <article class="deal-collection">
+    <header class="collection-header">
+      <div>
+        <p class="collection-eyebrow">Save at least 20%</p>
+        <h2 id="top-deals-title">Top deals</h2>
+      </div>
+      <span class="deal-count" *ngIf="!loading && !errorMessage">
+        {{ deals.length }} deal{{ deals.length === 1 ? '' : 's' }}
+      </span>
+    </header>
+
+    <p *ngIf="loading" class="deal-state" role="status">Finding the best deals…</p>
+    <p *ngIf="errorMessage" class="deal-state deal-error" role="alert">
+      {{ errorMessage }}
+    </p>
+    <p *ngIf="!loading && !errorMessage && deals.length === 0" class="deal-state">
+      No products currently meet the Top Deals criteria. Check back soon.
+    </p>
+
+    <div class="deal-grid" *ngIf="!loading && !errorMessage && deals.length">
+      <a
+        class="deal-item"
+        *ngFor="let item of deals"
+        [routerLink]="['/detail', item.id]"
+        [attr.aria-label]="item.name + ', ' + (item.discountPercentage | number: '1.0-0') + '% off'"
+      >
+        <div class="deal-image">
+          <img [src]="item.productUrl" [alt]="item.name" loading="lazy" />
+          <span class="deal-badge">{{ item.discountPercentage | number: '1.0-0' }}% off</span>
+        </div>
+        <div class="deal-product-info">
+          <p class="deal-category">{{ item.subcategory || item.category }}</p>
+          <h3>{{ item.name }}</h3>
+          <div class="deal-prices">
+            <strong>${{ item.price | number: '1.2-2' }}</strong>
+            <del>${{ item.originalPrice | number: '1.2-2' }}</del>
+          </div>
+          <span class="deal-seller">Sold by {{ item.seller }}</span>
+        </div>
+      </a>
+    </div>
+  </article>
+</section>

@@ -1,113 +1,207 @@
-<div class="product-detail" *ngIf="product">
-  <div class="image-section"><img src="{{ product.productUrl }}" alt="" /></div>
-  <div class="description-section">
-    <h4>{{ product.name }}</h4>
-    <h4>Price: {{ product.price }}</h4>
-    <h5>Description: {{ product.description }}</h5>
-    <div>
-      <h5>color:</h5>
-      <h6 [style.backgroundColor]="product.color" class="colorBox"></h6>
-    </div>
-    <h6>Quantity: 6</h6>
-    <div style="border: 0px solid black; width: fit-content">
-      <button
-        (click)="handleQuantity('dec')"
-        style="
-          text-align: center;
-          width: 3rem;
-          height: 2.4rem;
-          background-color: black;
-          border-radius: 10%;
-          color: white;
-          margin: 0.4rem 0 0.3rem 0;
-        "
-      >
-        -
-      </button>
-      <input
-        type="text"
-        value="{{ productQty }}"
-        style="
-          width: 3rem;
-          height: 2.2rem;
-          border-radius: 10%;
-          margin: 0.3rem 0 0 1rem;
-        "
-      />
-      <button
-        (click)="handleQuantity('inc')"
-        style="
-          text-align: center;
-          width: 3rem;
-          height: 2.4rem;
-          background-color: black;
-          border-radius: 10%;
-          color: white;
-          margin: 0.4rem 1rem 1rem 1rem;
-        "
-      >
-        +
-      </button>
-    </div>
-    <div>
-      <button
-        *ngIf="!removeCart"
-        class=""
-        style="
-          text-align: center;
-          width: 6rem;
-          height: 2.4rem;
-          background-color: black;
-          border-radius: 7%;
-          color: white;
-        "
-        (click)="addToCart()"
-      >
-        Add to cart
-      </button>
-      <button
-        *ngIf="removeCart"
-        class=""
-        style="
-          text-align: center;
-          width: 6rem;
-          height: 2.4rem;
-          background-color: black;
-          border-radius: 7%;
-          color: white;
-        "
-        (click)="removeToCart(product.id)"
-      >
-        Remove to cart
-      </button>
-      <button
-        style="
-          text-align: center;
-          width: 6rem;
-          height: 2.4rem;
-          background-color: black;
-          border-radius: 7%;
-          color: white;
-          margin-left: 1rem;
-        "
-      >
-        Buy now
-      </button>
-    </div>
+<main class="product-page" *ngIf="product; else productState">
+  <nav class="product-breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/">Home</a>
+    <span aria-hidden="true">/</span>
+    <span *ngIf="product.category">{{ product.category }}</span>
+    <span *ngIf="product.category" aria-hidden="true">/</span>
+    <span>{{ product.name }}</span>
+  </nav>
 
-    <ul class="bank-offer">
-      <br />
-      <a
-        href="#"
-        style="margin-left: -3rem; color: rgb(24, 8, 8); font-weight: bolder"
-        >Bank Offers</a
+  <div class="product-layout">
+    <section class="product-gallery" aria-label="Product images">
+      <div
+        class="product-main-image"
+        (mouseenter)="imageZoomActive = true"
+        (mousemove)="updateImageZoom($event)"
+        (mouseleave)="imageZoomActive = false"
       >
-      <li>SBI offer:flat 10% off on buying 2000 and above.</li>
-      <li>
-        SBI offer:flat 10% off on buying 2000 and above.SBI offer:flat 10% off
-      </li>
-      <li>SBI offer:flat 10% off on buying 2000 and above.SBI offer:flat</li>
-      <li>SBI offer:flat 10% off on buying 2000 and above.</li>
-    </ul>
+        <img [src]="product.productUrl" [alt]="product.name" />
+        <button
+          class="product-enlarge-button"
+          type="button"
+          (click)="openLargeImage()"
+          [attr.aria-label]="'View larger image of ' + product.name"
+        >
+          <span aria-hidden="true">⌕</span>
+          <span>View larger</span>
+        </button>
+      </div>
+      <div
+        class="product-zoom-preview"
+        [class.is-visible]="imageZoomActive"
+        aria-hidden="true"
+      >
+        <img
+          [src]="product.productUrl"
+          [alt]=""
+          [style.transformOrigin]="zoomTransformOrigin"
+        />
+      </div>
+      <div class="product-image-caption-row">
+        <p class="product-image-caption">Hover to zoom or tap View larger</p>
+        <span class="product-zoom-hint" aria-hidden="true">⌕ 2×</span>
+      </div>
+    </section>
+
+    <section class="product-information" aria-labelledby="product-title">
+      <p class="product-category-label">
+        {{ product.subcategory || product.category || 'ShopZone collection' }}
+      </p>
+      <h1 id="product-title">{{ product.name }}</h1>
+      <p class="product-id">Product #{{ product.id }}</p>
+
+      <div class="product-rating" aria-label="New product">
+        <span aria-hidden="true">NEW</span>
+        <span>Discover this ShopZone pick</span>
+      </div>
+
+      <div class="product-price-block">
+        <p class="product-price-label">Price</p>
+        <p class="product-price">${{ product.price | number: '1.2-2' }}</p>
+      </div>
+      <p class="product-stock-status" [class.product-out-of-stock]="(product.stockQuantity ?? 0) === 0">
+        {{
+          (product.stockQuantity ?? 0) > 0
+            ? product.stockQuantity + ' available'
+            : 'Currently out of stock'
+        }}
+      </p>
+
+      <div class="product-description-block">
+        <h2>About this item</h2>
+        <p>{{ product.description }}</p>
+      </div>
+
+      <div class="product-specifications">
+        <div *ngIf="product.color">
+          <span>Color</span>
+          <strong class="product-color-value">
+            <span
+              class="product-color-swatch"
+              [style.backgroundColor]="product.color"
+              aria-hidden="true"
+            ></span>
+            {{ product.color }}
+          </strong>
+        </div>
+        <div *ngIf="product.seller">
+          <span>Sold by</span>
+          <strong>{{ product.seller }}</strong>
+        </div>
+      </div>
+
+      <div class="product-purchase-panel">
+        <div class="product-quantity-row">
+          <span>Quantity</span>
+          <div class="product-quantity-control" aria-label="Choose quantity">
+            <button
+              type="button"
+              aria-label="Decrease quantity"
+              [disabled]="productQty <= 1"
+              (click)="handleQuantity('dec')"
+            >
+              &minus;
+            </button>
+            <output aria-live="polite">{{ productQty }}</output>
+            <button
+              type="button"
+              aria-label="Increase quantity"
+              [disabled]="productQty >= 10 || productQty >= (product.stockQuantity ?? 0)"
+              (click)="handleQuantity('inc')"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <button
+          *ngIf="!removeCart"
+          class="product-add-button"
+          type="button"
+          [disabled]="cartRequestInProgress || (product.stockQuantity ?? 0) < 1"
+          (click)="addToCart()"
+        >
+          {{
+            cartRequestInProgress
+              ? 'Adding…'
+              : (product.stockQuantity ?? 0) < 1
+                ? 'Out of stock'
+                : 'Add to cart'
+          }}
+        </button>
+        <button
+          *ngIf="removeCart"
+          class="product-remove-button"
+          type="button"
+          (click)="removeToCart(product.id)"
+        >
+          Remove from cart
+        </button>
+        <p class="product-cart-message" *ngIf="cartMessage" aria-live="polite">
+          {{ cartMessage }}
+        </p>
+        <p class="product-cart-error" *ngIf="cartError" role="alert">
+          {{ cartError }}
+        </p>
+      </div>
+
+      <div class="product-help">
+        <span class="product-help-icon" aria-hidden="true">i</span>
+        <p>Product details and availability may vary. Contact the seller for more information.</p>
+      </div>
+    </section>
   </div>
-</div>
+
+  <div
+    class="product-image-modal"
+    *ngIf="largeImageOpen"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Enlarged image of ' + product.name"
+    (click)="closeLargeImage()"
+  >
+    <button
+      class="product-image-modal-close"
+      type="button"
+      aria-label="Close enlarged image"
+      (click)="closeLargeImage()"
+    >
+      &times;
+    </button>
+    <div class="product-image-modal-content" (click)="$event.stopPropagation()">
+      <div class="product-image-modal-stage">
+        <img
+          [src]="product.productUrl"
+          [alt]="product.name"
+          [class.is-zoomed]="largeImageZoomed"
+        />
+      </div>
+      <button
+        class="product-image-modal-zoom"
+        type="button"
+        (click)="largeImageZoomed = !largeImageZoomed"
+      >
+        {{ largeImageZoomed ? 'Zoom out' : 'Zoom in' }}
+      </button>
+    </div>
+  </div>
+</main>
+
+<ng-template #productState>
+  <main class="product-state" aria-live="polite">
+    <div *ngIf="loading" class="product-state-card">
+      <span class="product-loading-indicator" aria-hidden="true"></span>
+      <p>Loading product details…</p>
+    </div>
+    <div *ngIf="!loading && loadError" class="product-state-card product-state-error">
+      <h1>Product details unavailable</h1>
+      <p>We couldn’t load this product. Please try again in a moment.</p>
+      <a routerLink="/">Back to shopping</a>
+    </div>
+    <div *ngIf="!loading && !loadError && !product" class="product-state-card">
+      <h1>Product not found</h1>
+      <p>This product may have been removed or is no longer available.</p>
+      <a routerLink="/">Continue shopping</a>
+    </div>
+  </main>
+</ng-template>

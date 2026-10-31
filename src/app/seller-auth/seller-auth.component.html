@@ -1,31 +1,102 @@
-<h1>Sign up form</h1>
-
-    <div *ngIf = '!showlogin' class="container">
-        <form #sellerSignup = "ngForm"(ngSubmit)=signUp(sellerSignup.value)>
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" ngModel placeholder="Enter your name" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" ngModel placeholder="Enter your password" required>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" ngModel placeholder="Enter your email" required>
-
-            <input type="submit" value="Submit">
-            <a class = "toggleLink" (click) = openlogin()>Already have an account signin</a>
-        </form>
-    </div>
-    <div *ngIf = 'showlogin' class="container">
-        <form #sellerSignIn = "ngForm"(ngSubmit)=signIn(sellerSignIn.value)>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" ngModel placeholder="Enter your email" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" ngModel placeholder="Enter your password" required>
-
-            <input type="submit" value="Submit">
-            <a class = "toggleLink"(click) = opensignup()>Don't have account signup</a>
-        </form>
+<main class="auth-page">
+  <section class="auth-card" aria-labelledby="seller-auth-title">
+    <div class="auth-intro">
+      <a class="auth-brand" routerLink="/" aria-label="ShopZone home">
+        <span class="auth-brand-mark" aria-hidden="true">S</span>
+        <span>shop<span>zone</span></span>
+      </a>
+      <p class="auth-eyebrow">ShopZone seller account</p>
+      <h1 id="seller-auth-title">
+        {{ showlogin ? 'Welcome back' : 'Start selling with us' }}
+      </h1>
+      <p class="auth-description">
+        {{
+          showlogin
+            ? 'Sign in to manage your shop and products.'
+            : 'Create your seller account and bring your products to more shoppers.'
+        }}
+      </p>
     </div>
 
+    <form
+      *ngIf="!showlogin"
+      #sellerSignup="ngForm"
+      (ngSubmit)="signUp(sellerSignup.value)"
+    >
+      <label for="seller-signup-name">Name</label>
+      <input
+        type="text"
+        id="seller-signup-name"
+        name="name"
+        ngModel
+        placeholder="Enter your name"
+        required
+        autocomplete="name"
+      />
+
+      <label for="seller-signup-email">Email</label>
+      <input
+        type="email"
+        id="seller-signup-email"
+        name="email"
+        ngModel
+        placeholder="you@example.com"
+        required
+        email
+        autocomplete="email"
+      />
+
+      <label for="seller-signup-password">Password</label>
+      <input
+        type="password"
+        id="seller-signup-password"
+        name="password"
+        ngModel
+        placeholder="Create a password"
+        required
+        autocomplete="new-password"
+      />
+
+      <button class="auth-submit" type="submit">Create seller account</button>
+      <p class="auth-toggle">
+        Already have an account?
+        <button type="button" (click)="openlogin()">Sign in</button>
+      </p>
+    </form>
+
+    <form
+      *ngIf="showlogin"
+      #sellerSignIn="ngForm"
+      (ngSubmit)="signIn(sellerSignIn.value)"
+    >
+      <label for="seller-login-email">Email</label>
+      <input
+        type="email"
+        id="seller-login-email"
+        name="email"
+        ngModel
+        placeholder="you@example.com"
+        required
+        email
+        autocomplete="email"
+      />
+
+      <label for="seller-login-password">Password</label>
+      <input
+        type="password"
+        id="seller-login-password"
+        name="password"
+        ngModel
+        placeholder="Enter your password"
+        required
+        autocomplete="current-password"
+      />
+
+      <button class="auth-submit" type="submit">Sign in</button>
+      <p class="auth-toggle">
+        Don’t have an account?
+        <button type="button" (click)="opensignup()">Create one</button>
+      </p>
+    </form>
+  </section>
+</main>

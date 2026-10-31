@@ -1,64 +1,291 @@
-/* styles.css */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #f4f4f4;
-  }
-  
-  .container {
-    background-color: #fff;
+:host {
+  display: block;
+  min-height: 78vh;
+  padding: clamp(24px, 5vw, 56px) 18px;
+  color: #eef8f0;
+  background:
+    radial-gradient(ellipse at 82% 0%, rgba(68, 173, 103, 0.14), transparent 34%),
+    linear-gradient(145deg, #0b110d, #111b14 58%, #0b100d);
+}
+
+.product-editor {
+  width: min(860px, 100%);
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 42px);
+  border: 1px solid rgba(151, 207, 165, 0.16);
+  border-radius: 22px;
+  background: rgba(13, 20, 15, 0.9);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+}
+
+.back-to-inventory {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #a8eab8;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-to-inventory:hover {
+  color: #d3f5dc;
+}
+
+.editor-header {
+  margin: 27px 0 30px;
+}
+
+.editor-eyebrow {
+  margin: 0 0 8px;
+  color: #8fe0a8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.editor-header h1 {
+  margin: 0;
+  color: #f3fff5;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+.editor-header > p:last-child {
+  margin: 10px 0 0;
+  color: #aab9ae;
+  line-height: 1.6;
+}
+
+.editor-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.editor-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  color: #dbe8de;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.editor-field-wide {
+  grid-column: 1 / -1;
+}
+
+.editor-field input,
+.editor-field select,
+.editor-field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 13px;
+  border: 1px solid #35443a;
+  border-radius: 10px;
+  outline: 0;
+  color: #eff8f0;
+  background: #111a14;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.editor-field textarea {
+  min-height: 125px;
+  resize: vertical;
+}
+
+.editor-field input:focus,
+.editor-field select:focus,
+.editor-field textarea:focus {
+  border-color: #72d395;
+  box-shadow: 0 0 0 3px rgba(114, 211, 149, 0.12);
+}
+
+.editor-field input::placeholder,
+.editor-field textarea::placeholder {
+  color: #829187;
+}
+
+.editor-field input[type='file'] {
+  padding: 8px;
+  color: #aab9ae;
+}
+
+.editor-field input[type='file']::file-selector-button {
+  margin-right: 10px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  color: #102116;
+  background: #a7efba;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editor-field input:disabled {
+  color: #7f8e83;
+  background: #171f19;
+}
+
+.editor-active-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.editor-active-field input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: #91e2a8;
+}
+
+.editor-active-field span {
+  line-height: 1.4;
+}
+
+.editor-field small {
+  color: #8fa195;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.input-with-prefix {
+  position: relative;
+}
+
+.input-with-prefix > span {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  color: #9de3ad;
+  transform: translateY(-50%);
+}
+
+.input-with-prefix input {
+  padding-left: 31px;
+}
+
+.image-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 14px;
+  border: 1px solid rgba(151, 207, 165, 0.14);
+  border-radius: 12px;
+  background: #111a14;
+}
+
+.image-preview img {
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+  background: #18251b;
+  object-fit: cover;
+}
+
+.image-preview strong,
+.image-preview span {
+  display: block;
+}
+
+.image-preview strong {
+  color: #eff8f0;
+}
+
+.image-preview span {
+  margin-top: 5px;
+  color: #8fa195;
+  font-size: 0.82rem;
+}
+
+.editor-error {
+  margin: 20px 0 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(244, 156, 145, 0.3);
+  border-radius: 10px;
+  color: #f2b3aa;
+  background: rgba(110, 39, 32, 0.18);
+  font-size: 0.88rem;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(151, 207, 165, 0.12);
+}
+
+.editor-cancel,
+.editor-submit {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 19px;
+  border: 1px solid #39483e;
+  border-radius: 10px;
+  color: #dce9df;
+  background: #172119;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.editor-submit {
+  border-color: #91e2a8;
+  color: #102116;
+  background: #91e2a8;
+}
+
+.editor-submit:hover:not(:disabled) {
+  background: #b0f0bf;
+}
+
+.editor-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.editor-state {
+  padding: 32px;
+  border-radius: 12px;
+  color: #aab9ae;
+  background: #111a14;
+  text-align: center;
+}
+
+@media (max-width: 620px) {
+  .product-editor {
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
-  
-  h2 {
-    text-align: center;
-    color: #333;
+
+  .editor-fields {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
-  
-  .add-product-form {
-    max-width: 400px;
-    margin: 0 auto;
+
+  .editor-field-wide {
+    grid-column: auto;
   }
-  
-  label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
+
+  .editor-actions {
+    flex-direction: column-reverse;
   }
-  
-  input,
-  textarea {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    box-sizing: border-box;
-  }
-  
-  button {
-    background-color: #4caf50;
-    color: #fff;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+
+  .editor-cancel,
+  .editor-submit {
     width: 100%;
   }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  /* Responsive styles */
-  @media (max-width: 600px) {
-    .add-product-form {
-      width: 100%;
-    }
-  }
-  
+}

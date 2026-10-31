@@ -6,10 +6,14 @@ import { SellerAuthComponent } from './seller-auth/seller-auth.component';
 import { SellerHomeComponent } from './seller-home/seller-home.component';
 import { authGuard } from './auth.guard';
 import { AddProductComponent } from './add-product/add-product.component';
-import { SellerProductListComponent } from './seller-product-list/seller-product-list.component';
 import { SearchComponent } from './search/search.component';
 import { ProductDetailComponent } from './product-detail/product-detail.component';
 import { UserAuthComponent } from './user-auth/user-auth.component';
+import { CategoryProductsComponent } from './category-products/category-products.component';
+import { CheckoutComponent } from './checkout/checkout.component';
+import { customerGuard } from './customer.guard';
+import { OrdersComponent } from './orders/orders.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const routes: Routes = [
   {
@@ -23,17 +27,21 @@ const routes: Routes = [
   {
     path: 'seller-home',
     component: SellerHomeComponent,
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
   },
   {
     path: 'seller-add-product',
     component: AddProductComponent,
-    // canActivate:[authGuard]
+    canActivate: [authGuard],
   },
   {
     path: 'app-product-list',
-    component: SellerProductListComponent,
-    // canActivate:[authGuard]
+    redirectTo: 'seller-home',
+    pathMatch: 'full',
+  },
+  {
+    path: 'category/:categorySlug',
+    component: CategoryProductsComponent,
   },
   {
     path: 'search/:query',
@@ -46,6 +54,21 @@ const routes: Routes = [
   {
     path: 'userAuth',
     component: UserAuthComponent,
+  },
+  {
+    path: 'checkout',
+    component: CheckoutComponent,
+    canActivate: [customerGuard],
+  },
+  {
+    path: 'orders',
+    component: OrdersComponent,
+    canActivate: [customerGuard],
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [customerGuard],
   },
 ];
 

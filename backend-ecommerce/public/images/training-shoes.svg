@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="title">
+  <title id="title">Green and black training shoe</title>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#173020"/>
+      <stop offset="1" stop-color="#080c09"/>
+    </linearGradient>
+    <linearGradient id="shoe" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#a7e8ba"/>
+      <stop offset="1" stop-color="#45b875"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="48" fill="url(#background)"/>
+  <circle cx="322" cy="326" r="220" fill="#72d395" opacity=".08"/>
+  <path d="M117 379q48-6 79-47l53-77q17-24 39-12l66 76q32 36 83 48l76 18q34 8 34 41v22H119q-25 0-25-24 0-39 23-45Z" fill="url(#shoe)" stroke="#d9f7e1" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M253 269l-24 79q57 24 110 0l-54-67q-14-17-32-12Z" fill="#14231a"/>
+  <path d="M272 291l47 41m-64-20 59 42m-82-23 51 35" fill="none" stroke="#72d395" stroke-width="11" stroke-linecap="round"/>
+  <path d="M111 432h435q0 34-34 34H126q-25 0-25-19 0-8 10-15Z" fill="#f2fff5"/>
+  <path d="M131 425h396" stroke="#157946" stroke-width="8" stroke-linecap="round"/>
+  <text x="320" y="540" fill="#eaffef" font-family="Arial,sans-serif" font-size="23" font-weight="700" letter-spacing="4" text-anchor="middle">ACTIVEFLEX</text>
+</svg>

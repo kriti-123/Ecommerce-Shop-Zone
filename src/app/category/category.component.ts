@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { STORE_CATEGORIES } from './category-data';
 
 @Component({
   selector: 'app-category',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './category.component.css'
 })
 export class CategoryComponent {
-
+  categories = STORE_CATEGORIES;
 }

@@ -1,24 +1,31 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { signUp } from '../data-type';
 
 @Component({
   selector: 'app-user-auth',
   templateUrl: './user-auth.component.html',
-  styleUrl: './user-auth.component.css',
 })
 export class UserAuthComponent implements OnInit {
-  constructor(private route: Router, private user: UserService) {}
+  private returnUrl = '/';
 
-  ngOnInit(): void {}
+  constructor(
+    private route: Router,
+    private activeRoute: ActivatedRoute,
+    private user: UserService
+  ) {}
+
+  ngOnInit(): void {
+    this.returnUrl =
+      this.activeRoute.snapshot.queryParamMap.get('returnUrl') || '/';
+  }
   showlogin = false;
   signUp(data: signUp): void {
-    console.log(data);
-    this.user.userSignup(data);
+    this.user.userSignup(data, this.returnUrl);
   }
-  signIn(data: signUp): void {
-    this.user.userLogin(data);
+  signIn(data: Pick<signUp, 'email' | 'password'>): void {
+    this.user.userLogin(data, this.returnUrl);
     // setTimeout(() => {
     //   localStorage.clear();
     //   this.route.navigate(['userAuth']);

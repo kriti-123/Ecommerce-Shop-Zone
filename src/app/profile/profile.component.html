@@ -1,0 +1,252 @@
+<main class="profile-page">
+  <section class="profile-shell" *ngIf="user; else profileUnavailable">
+    <header class="profile-header">
+      <p class="profile-eyebrow">Your ShopZone account</p>
+      <h1>Profile</h1>
+      <p>Manage your contact details, saved delivery address and orders.</p>
+    </header>
+
+    <article class="profile-account-card">
+      <div class="profile-avatar" aria-hidden="true">
+        {{ user.name.charAt(0).toUpperCase() }}
+      </div>
+      <div class="profile-account-info">
+        <p class="profile-section-label">Account information</p>
+        <h2>{{ user.name }}</h2>
+        <p>{{ user.email }}</p>
+      </div>
+      <span class="profile-account-badge">Customer account</span>
+    </article>
+
+    <p *ngIf="loading" class="profile-notice" role="status">Loading your saved profile…</p>
+    <p *ngIf="errorMessage" class="profile-notice profile-error" role="alert">
+      {{ errorMessage }}
+      <button *ngIf="!loading" type="button" (click)="loadProfile()">Try again</button>
+    </p>
+    <p *ngIf="successMessage" class="profile-notice profile-success" role="status">
+      {{ successMessage }}
+    </p>
+
+    <section class="profile-details-section" *ngIf="!loading" aria-labelledby="profile-details-title">
+      <header class="profile-details-heading">
+        <div>
+          <p class="profile-section-label">Personal information</p>
+          <h2 id="profile-details-title">Contact and delivery address</h2>
+          <p>Saved details will be filled in automatically at checkout.</p>
+        </div>
+        <button
+          *ngIf="!editing"
+          class="profile-edit-button"
+          type="button"
+          (click)="editProfile()"
+        >
+          Edit details
+        </button>
+      </header>
+
+      <div *ngIf="!editing" class="profile-saved-details">
+        <div class="profile-detail-row">
+          <span>Full name</span>
+          <strong>{{ user.name }}</strong>
+        </div>
+        <div class="profile-detail-row">
+          <span>Email address</span>
+          <strong>{{ user.email }}</strong>
+        </div>
+        <div class="profile-detail-row">
+          <span>Phone number</span>
+          <strong>{{ user.phone || 'Not added yet' }}</strong>
+        </div>
+        <div class="profile-detail-row profile-address-row">
+          <span>Saved delivery address</span>
+          <strong *ngIf="user.address?.addressLine1; else addressNotSaved">
+            {{ user.address.addressLine1 }}
+            <ng-container *ngIf="user.address.addressLine2">
+              <br />{{ user.address.addressLine2 }}
+            </ng-container>
+            <br />{{ user.address.city }}<ng-container *ngIf="user.address.state">, {{ user.address.state }}</ng-container>
+            {{ user.address.postalCode }}<br />{{ user.address.country }}
+            <small *ngIf="user.address.deliveryInstructions">
+              Delivery instructions: {{ user.address.deliveryInstructions }}
+            </small>
+          </strong>
+          <ng-template #addressNotSaved>
+            <strong>No saved address yet. Add one to speed up checkout.</strong>
+          </ng-template>
+        </div>
+      </div>
+
+      <form
+        *ngIf="editing"
+        class="profile-edit-form"
+        #profileForm="ngForm"
+        (ngSubmit)="saveProfile()"
+      >
+        <div class="profile-form-grid">
+          <label class="profile-form-field">
+            <span>Full name</span>
+            <input
+              type="text"
+              name="name"
+              [(ngModel)]="draft.name"
+              autocomplete="name"
+              minlength="2"
+              maxlength="80"
+              required
+            />
+          </label>
+          <label class="profile-form-field">
+            <span>Email address</span>
+            <input
+              type="email"
+              name="email"
+              [(ngModel)]="draft.email"
+              autocomplete="email"
+              maxlength="254"
+              required
+            />
+          </label>
+          <label class="profile-form-field">
+            <span>Phone number</span>
+            <input
+              type="tel"
+              name="phone"
+              [(ngModel)]="draft.phone"
+              autocomplete="tel"
+              pattern="^[+]?[\d\s().-]{7,24}$"
+              maxlength="24"
+              placeholder="+1 555 123 4567"
+            />
+          </label>
+          <label class="profile-form-field profile-form-wide">
+            <span>Street address</span>
+            <input
+              type="text"
+              name="addressLine1"
+              [(ngModel)]="draft.address.addressLine1"
+              autocomplete="address-line1"
+              maxlength="160"
+              placeholder="House number and street"
+            />
+          </label>
+          <label class="profile-form-field profile-form-wide">
+            <span>Apartment, suite or landmark <em>Optional</em></span>
+            <input
+              type="text"
+              name="addressLine2"
+              [(ngModel)]="draft.address.addressLine2"
+              autocomplete="address-line2"
+              maxlength="160"
+            />
+          </label>
+          <label class="profile-form-field">
+            <span>City</span>
+            <input
+              type="text"
+              name="city"
+              [(ngModel)]="draft.address.city"
+              autocomplete="address-level2"
+              maxlength="80"
+            />
+          </label>
+          <label class="profile-form-field">
+            <span>State / province / region</span>
+            <input
+              type="text"
+              name="state"
+              [(ngModel)]="draft.address.state"
+              autocomplete="address-level1"
+              maxlength="80"
+            />
+          </label>
+          <label class="profile-form-field">
+            <span>ZIP / postal code</span>
+            <input
+              type="text"
+              name="postalCode"
+              [(ngModel)]="draft.address.postalCode"
+              autocomplete="postal-code"
+              maxlength="20"
+            />
+          </label>
+          <label class="profile-form-field">
+            <span>Country</span>
+            <input
+              type="text"
+              name="country"
+              [(ngModel)]="draft.address.country"
+              autocomplete="country-name"
+              maxlength="80"
+            />
+          </label>
+          <label class="profile-form-field profile-form-wide">
+            <span>Delivery instructions <em>Optional</em></span>
+            <textarea
+              name="deliveryInstructions"
+              [(ngModel)]="draft.address.deliveryInstructions"
+              maxlength="500"
+              rows="3"
+            ></textarea>
+          </label>
+        </div>
+        <div class="profile-form-actions">
+          <button
+            class="profile-save-button"
+            type="submit"
+            [disabled]="profileForm.invalid || saving"
+          >
+            {{ saving ? 'Saving…' : 'Save changes' }}
+          </button>
+          <button
+            class="profile-cancel-button"
+            type="button"
+            [disabled]="saving"
+            (click)="cancelEditing()"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="profile-shortcuts" aria-labelledby="profile-shortcuts-title">
+      <h2 id="profile-shortcuts-title">Your shopping</h2>
+      <a class="profile-shortcut-card" routerLink="/orders">
+        <span class="profile-shortcut-icon" aria-hidden="true">↗</span>
+        <span class="profile-shortcut-copy">
+          <strong>Track your orders</strong>
+          <span>Check order status, delivery progress, and order details.</span>
+        </span>
+        <span class="profile-shortcut-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="profile-shortcut-card" routerLink="/checkout">
+        <span class="profile-shortcut-icon" aria-hidden="true">▱</span>
+        <span class="profile-shortcut-copy">
+          <strong>Your cart</strong>
+          <span>Review items and continue to checkout.</span>
+        </span>
+        <span class="profile-shortcut-arrow" aria-hidden="true">→</span>
+      </a>
+    </section>
+
+    <button class="profile-sign-out" type="button" (click)="signOut()">
+      Sign out
+    </button>
+  </section>
+</main>
+
+<ng-template #profileUnavailable>
+  <main class="profile-page">
+    <section class="profile-unavailable" *ngIf="loading; else profileLoadError">
+      <h1>Loading your profile</h1>
+      <p role="status">Your contact details and saved delivery address are on the way.</p>
+    </section>
+    <ng-template #profileLoadError>
+      <section class="profile-unavailable">
+        <h1>Could not load your profile</h1>
+        <p>{{ errorMessage || 'Please try again in a moment.' }}</p>
+        <button type="button" (click)="loadProfile()">Try again</button>
+      </section>
+    </ng-template>
+  </main>
+</ng-template>

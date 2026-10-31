@@ -1,0 +1,160 @@
+<main class="store-page" *ngIf="category; else invalidCategory">
+  <div class="store-breadcrumb">
+    <a routerLink="/">Home</a>
+    <span aria-hidden="true">/</span>
+    <span>{{ category.name }}</span>
+    <ng-container *ngIf="selectedSubcategory">
+      <span aria-hidden="true">/</span>
+      <span>{{ selectedSubcategory }}</span>
+    </ng-container>
+  </div>
+
+  <section class="store-hero">
+    <img [src]="category.image" [alt]="category.alt" />
+    <div class="store-hero-copy">
+      <p>SHOPZONE COLLECTION</p>
+      <h1>{{ selectedSubcategory || category.name }}</h1>
+      <span>{{ category.description }}</span>
+    </div>
+  </section>
+
+  <nav class="store-subcategory-nav" [attr.aria-label]="category.name + ' categories'">
+    <a
+      [routerLink]="['/category', category.slug]"
+      [class.active]="!selectedSubcategory"
+      >All {{ category.name }}</a
+    >
+    <a
+      *ngFor="let subcategory of category.subcategories"
+      [routerLink]="['/category', category.slug]"
+      [queryParams]="{ subcategory: subcategory }"
+      [class.active]="selectedSubcategory === subcategory"
+      >{{ subcategory }}</a
+    >
+  </nav>
+
+  <div class="store-layout">
+    <aside class="store-sidebar" aria-label="Product filters">
+      <section class="filter-group">
+        <h2>Shop by category</h2>
+        <a
+          *ngFor="let storeCategory of categories"
+          [routerLink]="['/category', storeCategory.slug]"
+          [class.current-category]="storeCategory.slug === category.slug"
+        >
+          {{ storeCategory.name }}
+        </a>
+      </section>
+
+      <section class="filter-group">
+        <h2>{{ category.name }} subcategories</h2>
+        <a
+          *ngFor="let subcategory of category.subcategories"
+          [routerLink]="['/category', category.slug]"
+          [queryParams]="{ subcategory: subcategory }"
+          [class.current-category]="selectedSubcategory === subcategory"
+        >
+          {{ subcategory }}
+        </a>
+      </section>
+
+      <section class="filter-group">
+        <h2>Price</h2>
+        <label for="max-price">Maximum price</label>
+        <select
+          id="max-price"
+          #priceSelect
+          [value]="selectedPriceLimit"
+          (change)="setMaxPrice(priceSelect.value)"
+        >
+          <option value="">Any price</option>
+          <option value="1000">Up to $1,000</option>
+          <option value="10000">Up to $10,000</option>
+          <option value="50000">Up to $50,000</option>
+          <option value="100000">Up to $100,000</option>
+        </select>
+      </section>
+    </aside>
+
+    <section class="store-results" aria-labelledby="results-title">
+      <header class="results-header">
+        <div>
+          <h2 id="results-title">
+            {{ selectedSubcategory || category.name }}
+          </h2>
+          <p *ngIf="!loading && !loadError">
+            {{ visibleProducts.length }} products
+          </p>
+        </div>
+        <label class="sort-control" for="sort-products">
+          Sort by
+          <select
+            id="sort-products"
+            #sortSelect
+            (change)="setSortOrder(sortSelect.value)"
+          >
+            <option value="relevance">Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+          </select>
+        </label>
+      </header>
+
+      <p class="store-status" *ngIf="loading">Loading products…</p>
+      <div class="store-status store-error" *ngIf="!loading && loadError">
+        <h3>We couldn’t load products</h3>
+        <p>Check that the product service is running, then refresh this page.</p>
+      </div>
+
+      <div
+        class="store-product-grid"
+        *ngIf="!loading && !loadError && visibleProducts.length"
+      >
+        <article class="store-product-card" *ngFor="let item of visibleProducts">
+          <a
+            class="store-product-image"
+            [routerLink]="['/detail', item.id]"
+            [attr.aria-label]="'View ' + item.name"
+          >
+            <img [src]="item.productUrl" [alt]="item.name" loading="lazy" />
+          </a>
+          <div class="store-product-info">
+            <p class="store-product-category">
+              {{ item.subcategory || item.category || category.name }}
+            </p>
+            <h3>
+              <a [routerLink]="['/detail', item.id]">{{ item.name }}</a>
+            </h3>
+            <p class="store-product-description">{{ item.description }}</p>
+            <p class="store-product-price">${{ item.price | number: '1.2-2' }}</p>
+            <a class="store-view-product" [routerLink]="['/detail', item.id]">
+              View product <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        </article>
+      </div>
+
+      <div
+        class="store-status store-empty"
+        *ngIf="!loading && !loadError && !visibleProducts.length"
+      >
+        <h3>No products in this collection yet</h3>
+        <p>
+          Try another category, or check back after a seller adds products here.
+        </p>
+        <button type="button" (click)="clearFilters()" *ngIf="hasActiveFilters">
+          Clear filters
+        </button>
+        <a routerLink="/">Continue shopping</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<ng-template #invalidCategory>
+  <main class="store-status store-empty">
+    <h1>Category not found</h1>
+    <p>Choose a category to browse products.</p>
+    <a routerLink="/">Back to home</a>
+  </main>
+</ng-template>

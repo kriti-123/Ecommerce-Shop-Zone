@@ -1,144 +1,140 @@
-<nav class="navbar bg-dark navbar-expand-lg">
-  <div class="container-fluid">
+<nav class="navbar navbar-dark navbar-expand-lg">
+  <div class="container-fluid navbar-inner">
+    <a class="navbar-brand shopzone-brand" routerLink="/" aria-label="ShopZone home">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span class="brand-name">shop<span>zone</span></span>
+    </a>
+
     <button
       class="navbar-toggler"
       type="button"
       data-bs-toggle="collapse"
-      data-bs-target="#navbarTogglerDemo01"
-      aria-controls="navbarTogglerDemo01"
+      data-bs-target="#shopzoneNavigation"
+      aria-controls="shopzoneNavigation"
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
+
     <div
       [ngSwitch]="menuType"
       class="collapse navbar-collapse"
-      id="navbarTogglerDemo01"
+      id="shopzoneNavigation"
     >
-      <!-- <a class="navbar-brand" style="color: white" routerLink="/">KKcom</a> -->
       <ul
         *ngSwitchCase="'default'"
-        class="navbar-nav me-auto mb-2 mb-lg-0 listNav"
+        class="navbar-nav main-nav me-lg-auto mb-2 mb-lg-0 listNav"
       >
         <li class="nav-item">
-          <a
-            class="nav-link active"
-            style="color: white"
-            aria-current="page"
-            routerLink=""
-            >Home</a
-          >
+          <a class="nav-link" aria-current="page" routerLink="/">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" style="color: white" routerLink="userAuth"
-            >Login</a
-          >
+          <a class="nav-link" routerLink="/userAuth">Login</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" style="color: white" routerLink="sellerAuth"
-            >Seller</a
-          >
+          <a class="nav-link cart-link" routerLink="/checkout">Cart <span class="cart-count">{{ cartItem }}</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" style="color: white" href="#"
-            >Cart({{ cartItem }})</a
-          >
+          <a class="nav-link" routerLink="/sellerAuth">Seller</a>
         </li>
       </ul>
-      <ul *ngSwitchCase="'seller'" class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul
+        *ngSwitchCase="'seller'"
+        class="navbar-nav main-nav me-lg-auto mb-2 mb-lg-0"
+      >
         <li class="nav-item">
-          <a
-            class="nav-link"
-            style="color: white"
-            routerLink="seller-add-product"
-            >Add products</a
-          >
-        </li>
-        <li class="nav-item" style="color: white">
-          <a class="nav-link" style="color: white">{{ userName }}</a>
+          <a class="nav-link" routerLink="/seller-home">Seller dashboard</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" style="color: white" routerLink="/">Profile</a>
+          <a class="nav-link" routerLink="/seller-add-product">Add product</a>
         </li>
         <li class="nav-item">
-          <a (click)="sellerlogout()" class="nav-link" style="color: white"
-            >logout</a
-          >
+          <span class="nav-link user-name">{{ userName }}</span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/seller-home">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a (click)="sellerlogout()" class="nav-link logout-link">Logout</a>
         </li>
       </ul>
-      <ul *ngSwitchCase="'user'" class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul
+        *ngSwitchCase="'user'"
+        class="navbar-nav main-nav me-lg-auto mb-2 mb-lg-0"
+      >
         <li class="nav-item">
-          <a class="nav-link" style="color: white">Profile</a>
+          <a class="nav-link" routerLink="/profile">Profile</a>
         </li>
-        <li class="nav-item listNav" (click)="userlogout()">
-          <a (click)="userlogout()" class="nav-link" style="color: white"
-            >logout</a
-          >
+        <li class="nav-item" (click)="userlogout()">
+          <a (click)="userlogout()" class="nav-link logout-link">Logout</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" style="color: white" href="#"
-            >Cart({{ cartItem }})</a
-          >
+          <a class="nav-link cart-link" routerLink="/checkout">
+            Cart <span class="cart-count">{{ cartItem }}</span>
+          </a>
+          <span *ngIf="cartLoadError" class="visually-hidden" role="status">
+            {{ cartLoadError }}
+          </span>
         </li>
-        <li class="nav-item" style="color: white">
-          <a class="nav-link" style="color: white">{{ userName }}</a>
+        <li class="nav-item">
+          <span class="nav-link user-name">{{ userName }}</span>
         </li>
       </ul>
-      <form class="d-flex formcustom ms-auto" role="search">
-        <input
-          #searchInput
-          class="form-control me-2 ipfield"
-          (keyup)="searchProduct($event)"
-          (blur)="hideSerchResult()"
-          type="search"
-          placeholder="Search"
-          aria-label="Search"
-        />
-        <button
-          class="btn btn-outline-success"
-          type="submit"
-          (click)="submitSearch(searchInput.value)"
-        >
-          Search
-        </button>
+      <form
+        class="search-form ms-lg-auto"
+        role="search"
+        (ngSubmit)="submitSearch(searchInput.value)"
+      >
+        <div class="search-box">
+          <input
+            #searchInput
+            class="form-control ipfield"
+            (input)="searchProduct(searchInput.value)"
+            (focus)="searchProduct(searchInput.value)"
+            (blur)="hideSearchResults()"
+            type="search"
+            placeholder="Search products, brands and more"
+            aria-label="Search all products"
+            aria-controls="product-search-suggestions"
+            [attr.aria-expanded]="searchSuggestionsVisible"
+            autocomplete="off"
+          />
+          <ul
+            id="product-search-suggestions"
+            class="suggestionList"
+            *ngIf="searchSuggestionsVisible"
+            aria-label="Product suggestions"
+          >
+            <li class="suggestion-status" *ngIf="searchLoading" aria-live="polite">
+              Searching all products…
+            </li>
+            <li class="suggestion-status" *ngIf="searchError" aria-live="polite">
+              Search is unavailable. Please try again.
+            </li>
+            <li
+              class="suggestion-status"
+              *ngIf="!searchLoading && !searchError && searchResult.length === 0"
+              aria-live="polite"
+            >
+              No matching products found.
+            </li>
+            <li *ngFor="let item of searchResult">
+              <button
+                type="button"
+                class="suggestion-item"
+                (mousedown)="gotoPd(item.id); $event.preventDefault()"
+              >
+                <span>{{ item.name }}</span>
+                <span class="suggestion-meta">
+                  {{ item.category || 'Product' }} · ${{ item.price }}
+                </span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <button class="btn search-submit" type="submit">Search</button>
       </form>
     </div>
   </div>
-  <ul class="suggestionList" *ngIf="searchResult">
-    <li *ngFor="let item of searchResult">
-      <a (mousedown)="gotoPd(item.id)">{{ item.name }}</a>
-    </li>
-  </ul>
 </nav>
-<!-- show search result -->
-<!-- <div class="container p-4"> -->
-<!-- <h3 style="text-align: center">Search Result Goes here...</h3> -->
-
-<!-- <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-    <div *ngFor="let item of searchResult" class="col hoverEffect">
-      <div class="card h-100 hoverEffect cardSize">
-        <img
-          src="{{ item.productUrl }}"
-          class="card-img-top"
-          alt="{{ item.name }}"
-        />
-        <div class="card-body">
-          <h5 class="card-title">{{ item.name }}</h5>
-          <p class="card-text">{{ item.description }}</p>
-          <p class="card-text">
-            <strong>Price: ${{ item.price }}</strong>
-          </p>
-          <div class="card-actions d-flex justify-content-between">
-            <button class="btn btn-light">
-              <i class="fa fa-eye" aria-hidden="true"></i>
-            </button>
-            <button class="btn btn-light">
-              <i class="fa fa-cart-plus" aria-hidden="true"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
-<!-- </div> -->

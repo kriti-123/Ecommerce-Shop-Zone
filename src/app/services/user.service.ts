@@ -1,45 +1,53 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { signUp } from '../data-type';
-import { Observable } from 'rxjs';
+import { AuthResponse, signUp } from '../data-type';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private http: HttpClient, private router: Router) {}
-  userSignup(data: signUp) {
-    this.http
-      .post('http://localhost:3000/user', data, { observe: 'response' })
-      .subscribe((result) => {
-        if (result) {
-          localStorage.setItem('data', JSON.stringify(result.body));
-        }
+  constructor(private auth: AuthService, private router: Router) {}
 
-        this.router.navigate(['']);
-      });
+  userSignup(data: signUp, returnUrl?: string): void {
+    this.auth.register(data, 'user').subscribe({
+      next: (result) => {
+        this.saveSession(result);
+        this.navigateAfterSignIn(returnUrl);
+      },
+      error: (error: HttpErrorResponse) => {
+        alert(error.error?.message || 'Could not create your account. Please try again.');
+      },
+    });
   }
-  userLogin(data: signUp) {
-    this.http
-      .get(
-        `http://localhost:3000/user?email=${data.email}&password=${data.password}`
-      )
-      .subscribe((result) => {
-        console.log(result, 'logindata');
-        // this.router.navigate(['/']);
-        const resultArray = Array.isArray(result) ? result : [result];
-        if (resultArray.length > 0) {
-          // localStorage.setItem('email', data.email);
-          console.log(resultArray[0], 'this is login data');
-          localStorage.setItem('data', JSON.stringify(resultArray[0]));
-          this.router.navigate(['']);
-        } else {
-          alert('login failed!!!');
-        }
-      });
+
+  userLogin(
+    data: Pick<signUp, 'email' | 'password'>,
+    returnUrl?: string
+  ): void {
+    this.auth.login(data, 'user').subscribe({
+      next: (result) => {
+        this.saveSession(result);
+        this.navigateAfterSignIn(returnUrl);
+      },
+      error: (error: HttpErrorResponse) => {
+        alert(error.error?.message || 'Sign in failed. Check your details and try again.');
+      },
+    });
   }
-}
-function subscribe(arg0: (result: any) => void) {
-  throw new Error('Function not implemented.');
+
+  private saveSession(result: AuthResponse): void {
+    localStorage.removeItem('selerdata');
+    localStorage.setItem('authToken', result.token);
+    localStorage.setItem('data', JSON.stringify(result.user));
+  }
+
+  private navigateAfterSignIn(returnUrl?: string): void {
+    const safeReturnUrl =
+      returnUrl?.startsWith('/') && !returnUrl.startsWith('//')
+        ? returnUrl
+        : '/';
+    this.router.navigateByUrl(safeReturnUrl);
+  }
 }

@@ -1,0 +1,138 @@
+<main class="orders-page">
+  <div class="orders-shell">
+    <header class="orders-header">
+      <div>
+        <p class="orders-eyebrow">Your ShopZone account</p>
+        <h1>My orders</h1>
+        <p>View your purchases and follow each order’s progress.</p>
+      </div>
+      <a routerLink="/" class="orders-shop-link">Continue shopping</a>
+    </header>
+
+    <div *ngIf="loading" class="orders-state" role="status">
+      Loading your orders…
+    </div>
+
+    <section *ngIf="errorMessage && !loading" class="orders-state orders-error" role="alert">
+      <p>{{ errorMessage }}</p>
+      <button type="button" class="orders-secondary-button" (click)="loadOrders()">
+        Try again
+      </button>
+    </section>
+
+    <p *ngIf="actionError" class="orders-state orders-error" role="alert">
+      {{ actionError }}
+    </p>
+
+    <section *ngIf="!loading && !errorMessage && orders.length === 0" class="orders-state orders-empty">
+      <span class="orders-empty-icon" aria-hidden="true">▱</span>
+      <h2>No orders yet</h2>
+      <p>Once you place an order, its tracking progress will appear here.</p>
+      <a routerLink="/">Find something to love</a>
+    </section>
+
+    <section
+      class="order-card"
+      *ngFor="let order of orders; trackBy: trackByOrderId"
+      [attr.aria-labelledby]="'order-title-' + order.id"
+    >
+      <header class="order-card-header">
+        <div>
+          <p class="order-date">{{ order.createdAt | date: 'mediumDate' }}</p>
+          <h2 [id]="'order-title-' + order.id">Order #{{ order.id }}</h2>
+        </div>
+        <div class="order-header-total">
+          <span>
+            {{ activeItemCount(order) }} active
+            item{{ activeItemCount(order) === 1 ? '' : 's' }}
+          </span>
+          <strong>${{ order.total | number: '1.2-2' }}</strong>
+        </div>
+      </header>
+
+      <div
+        class="order-status-banner"
+        [class.order-status-cancelled]="order.status === 'cancelled'"
+      >
+        <span class="order-status-dot" aria-hidden="true"></span>
+        <div>
+          <strong>{{ statusLabel(order.status) }}</strong>
+          <span>
+            {{
+              order.status === 'delivered'
+                ? 'Your order has been delivered.'
+                : order.status === 'cancelled'
+                  ? 'This order was cancelled.'
+                  : 'We’ll update your tracking here as your order moves forward.'
+            }}
+          </span>
+        </div>
+        <span class="order-payment">Cash on delivery</span>
+      </div>
+
+      <ol
+        *ngIf="order.status !== 'cancelled'"
+        class="order-tracking-steps"
+        [attr.aria-label]="'Order status: ' + statusLabel(order.status)"
+      >
+        <li
+          *ngFor="let step of steps; let index = index"
+          [class.tracking-step-complete]="index <= statusStep(order.status)"
+          [class.tracking-step-current]="index === statusStep(order.status)"
+        >
+          <span class="tracking-marker" aria-hidden="true">
+            {{ index < statusStep(order.status) ? '✓' : index + 1 }}
+          </span>
+          <span class="tracking-label">{{ statusLabel(step) }}</span>
+        </li>
+      </ol>
+
+      <ul class="order-items">
+        <li
+          *ngFor="let item of order.items"
+          [class.order-item-cancelled]="item.status === 'cancelled'"
+        >
+          <img [src]="item.productUrl" [alt]="item.name" />
+          <div class="order-item-info">
+            <strong>{{ item.name }}</strong>
+            <span>
+              Sold by {{ item.seller }} · Qty {{ item.quantity }}
+              <ng-container *ngIf="item.status === 'cancelled'"> · Cancelled</ng-container>
+            </span>
+          </div>
+          <strong class="order-item-total">${{ item.lineTotal | number: '1.2-2' }}</strong>
+          <button
+            *ngIf="canCancelItems(order) && item.status !== 'cancelled'"
+            class="order-item-cancel"
+            type="button"
+            [disabled]="cancellingItemId !== null"
+            (click)="cancelItem(order, item)"
+          >
+            {{ isCancelling(order, item.productId) ? 'Cancelling…' : 'Cancel item' }}
+          </button>
+        </li>
+      </ul>
+
+      <footer class="order-card-footer">
+        <div>
+          <span>Delivering to</span>
+          <strong>
+            {{ order.deliveryAddress.fullName }} · {{ order.deliveryAddress.phone }}
+          </strong>
+          <small>
+            {{ order.deliveryAddress.addressLine1 }}
+            <ng-container *ngIf="order.deliveryAddress.addressLine2">
+              , {{ order.deliveryAddress.addressLine2 }}
+            </ng-container>
+            · {{ order.deliveryAddress.city }}, {{ order.deliveryAddress.state }}
+            {{ order.deliveryAddress.postalCode }}, {{ order.deliveryAddress.country }}
+          </small>
+        </div>
+        <div class="order-total-summary">
+          <span>Total paid on delivery</span>
+          <strong>${{ order.total | number: '1.2-2' }}</strong>
+        </div>
+      </footer>
+    </section>
+  </div>
+</main>

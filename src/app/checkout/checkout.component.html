@@ -1,0 +1,315 @@
+<main class="checkout-page">
+  <div class="checkout-shell" *ngIf="!order; else orderConfirmation">
+    <header class="checkout-header">
+      <p class="checkout-eyebrow">ShopZone checkout</p>
+      <h1>Delivery details</h1>
+      <p>Where should we deliver your order?</p>
+      <ol class="checkout-steps" aria-label="Checkout progress">
+        <li class="checkout-step-done"><span>1</span> Cart</li>
+        <li class="checkout-step-active"><span>2</span> Delivery</li>
+        <li><span>3</span> Confirmation</li>
+      </ol>
+    </header>
+
+    <p *ngIf="cartError" class="checkout-alert" role="alert">{{ cartError }}</p>
+    <p *ngIf="savedProfileNotice" class="checkout-alert" role="status">
+      {{ savedProfileNotice }}
+      <a routerLink="/profile">Update your saved address</a>
+    </p>
+    <div *ngIf="loading" class="checkout-state" role="status">Loading your cart…</div>
+
+    <div class="checkout-layout" *ngIf="!loading && cartItems.length">
+      <form
+        class="checkout-card delivery-card"
+        #checkoutForm="ngForm"
+        (ngSubmit)="placeOrder()"
+      >
+        <div class="checkout-card-heading">
+          <span class="checkout-heading-icon" aria-hidden="true">01</span>
+          <div>
+            <h2>Contact and delivery address</h2>
+            <p>We’ll use these details to deliver your order.</p>
+          </div>
+        </div>
+
+        <div class="delivery-fields">
+          <label class="checkout-field">
+            <span>Full name</span>
+            <input
+              type="text"
+              name="fullName"
+              [(ngModel)]="address.fullName"
+              autocomplete="name"
+              minlength="2"
+              maxlength="100"
+              required
+            />
+          </label>
+          <label class="checkout-field">
+            <span>Email address</span>
+            <input
+              type="email"
+              name="email"
+              [(ngModel)]="address.email"
+              autocomplete="email"
+              maxlength="254"
+              required
+            />
+            <small>Order updates will be sent to your account email.</small>
+          </label>
+          <label class="checkout-field">
+            <span>Phone number</span>
+            <input
+              type="tel"
+              name="phone"
+              [(ngModel)]="address.phone"
+              autocomplete="tel"
+              inputmode="tel"
+              pattern="^[+]?[\d\s().-]{7,24}$"
+              minlength="7"
+              maxlength="24"
+              placeholder="+1 555 123 4567"
+              required
+            />
+            <small>Include your country code so the courier can reach you.</small>
+          </label>
+          <label class="checkout-field checkout-field-wide">
+            <span>Street address</span>
+            <input
+              type="text"
+              name="addressLine1"
+              [(ngModel)]="address.addressLine1"
+              autocomplete="address-line1"
+              minlength="4"
+              maxlength="160"
+              placeholder="House number and street"
+              required
+            />
+          </label>
+          <label class="checkout-field checkout-field-wide">
+            <span>Apartment, suite or landmark <em>Optional</em></span>
+            <input
+              type="text"
+              name="addressLine2"
+              [(ngModel)]="address.addressLine2"
+              autocomplete="address-line2"
+              maxlength="160"
+            />
+          </label>
+          <label class="checkout-field">
+            <span>City</span>
+            <input
+              type="text"
+              name="city"
+              [(ngModel)]="address.city"
+              autocomplete="address-level2"
+              minlength="2"
+              maxlength="80"
+              required
+            />
+          </label>
+          <label class="checkout-field">
+            <span>State / province / region</span>
+            <input
+              type="text"
+              name="state"
+              [(ngModel)]="address.state"
+              autocomplete="address-level1"
+              minlength="2"
+              maxlength="80"
+              required
+            />
+          </label>
+          <label class="checkout-field">
+            <span>ZIP / postal code</span>
+            <input
+              type="text"
+              name="postalCode"
+              [(ngModel)]="address.postalCode"
+              autocomplete="postal-code"
+              minlength="3"
+              maxlength="20"
+              required
+            />
+          </label>
+          <label class="checkout-field">
+            <span>Country</span>
+            <input
+              type="text"
+              name="country"
+              [(ngModel)]="address.country"
+              autocomplete="country-name"
+              minlength="2"
+              maxlength="80"
+              required
+            />
+          </label>
+          <label class="checkout-field checkout-field-wide">
+            <span>Delivery instructions <em>Optional</em></span>
+            <textarea
+              name="deliveryInstructions"
+              [(ngModel)]="address.deliveryInstructions"
+              maxlength="500"
+              rows="3"
+              placeholder="Gate code, preferred drop-off spot, or other helpful details"
+            ></textarea>
+          </label>
+        </div>
+
+        <section class="payment-choice" aria-labelledby="payment-title">
+          <span class="checkout-heading-icon" aria-hidden="true">02</span>
+          <div>
+            <h2 id="payment-title">Payment method</h2>
+            <label class="payment-option">
+              <input type="radio" checked disabled />
+              <span class="payment-radio" aria-hidden="true"></span>
+              <span>
+                <strong>Cash on delivery</strong>
+                <small>Pay the courier when your order arrives.</small>
+              </span>
+              <span class="payment-tag">Available</span>
+            </label>
+          </div>
+        </section>
+
+        <p *ngIf="errorMessage" class="checkout-alert" role="alert">
+          {{ errorMessage }}
+        </p>
+        <button
+          class="place-order-button"
+          type="submit"
+          [disabled]="checkoutForm.invalid || placingOrder || !cartItems.length"
+        >
+          {{ placingOrder ? 'Placing your order…' : 'Place order · $' + (total | number: '1.2-2') }}
+        </button>
+        <p class="checkout-secure-note">
+          Your order is placed securely. Payment is collected on delivery.
+        </p>
+      </form>
+
+      <aside class="checkout-card order-summary">
+        <div class="checkout-card-heading">
+          <span class="checkout-heading-icon" aria-hidden="true">03</span>
+          <div>
+            <h2>Order summary</h2>
+            <p>{{ cartItems.length }} item{{ cartItems.length === 1 ? '' : 's' }} in your order</p>
+          </div>
+        </div>
+
+        <ul class="checkout-items">
+          <li *ngFor="let item of cartItems">
+            <img [src]="item.productUrl" [alt]="item.name" />
+            <div class="checkout-item-info">
+              <strong>{{ item.name }}</strong>
+              <span>{{ item.seller }} · ${{ item.price | number: '1.2-2' }}</span>
+              <div class="checkout-item-controls">
+                <div class="checkout-quantity">
+                  <button
+                    type="button"
+                    [disabled]="updatingProductId !== null || (item.quantity ?? 1) <= 1"
+                    [attr.aria-label]="'Decrease ' + item.name + ' quantity'"
+                    (click)="updateQuantity(item, (item.quantity ?? 1) - 1)"
+                  >−</button>
+                  <span>{{ item.quantity ?? 1 }}</span>
+                  <button
+                    type="button"
+                    [disabled]="
+                      updatingProductId !== null ||
+                      (item.quantity ?? 1) >= 10 ||
+                      (item.quantity ?? 1) >= (item.stockQuantity ?? 0)
+                    "
+                    [attr.aria-label]="'Increase ' + item.name + ' quantity'"
+                    (click)="updateQuantity(item, (item.quantity ?? 1) + 1)"
+                  >+</button>
+                </div>
+                <button
+                  type="button"
+                  class="checkout-remove"
+                  [disabled]="updatingProductId !== null"
+                  (click)="removeItem(item)"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+            <strong class="checkout-line-total">
+              ${{ item.price * (item.quantity ?? 1) | number: '1.2-2' }}
+            </strong>
+          </li>
+        </ul>
+
+        <div class="summary-lines">
+          <div><span>Subtotal</span><strong>${{ subtotal | number: '1.2-2' }}</strong></div>
+          <div><span>Delivery</span><strong class="free-delivery">FREE</strong></div>
+          <div class="summary-total"><span>Total due on delivery</span><strong>${{ total | number: '1.2-2' }}</strong></div>
+        </div>
+        <p class="delivery-estimate">
+          <span aria-hidden="true">✓</span>
+          Estimated delivery in 3–5 business days
+        </p>
+      </aside>
+    </div>
+
+    <section *ngIf="!loading && !cartItems.length" class="checkout-state empty-checkout">
+      <span class="empty-cart-icon" aria-hidden="true">▱</span>
+      <h2>Your cart is empty</h2>
+      <p>Add a few products before continuing to checkout.</p>
+      <a routerLink="/">Continue shopping</a>
+    </section>
+  </div>
+
+  <ng-template #orderConfirmation>
+    <section class="order-confirmation" aria-live="polite">
+      <div class="confirmation-check" aria-hidden="true">✓</div>
+      <p class="checkout-eyebrow">Order confirmed</p>
+      <h1>Thank you, {{ order?.deliveryAddress?.fullName }}!</h1>
+      <p class="confirmation-intro">
+        Your order has been placed. We’ll contact you at
+        <strong>{{ order?.deliveryAddress?.phone }}</strong> and send order details to
+        <strong>{{ order?.deliveryAddress?.email }}</strong>.
+      </p>
+      <div class="confirmation-number">
+        <span>Order number</span>
+        <strong>#{{ order?.id }}</strong>
+      </div>
+      <div class="confirmation-details">
+        <div>
+          <span>Delivering to</span>
+          <strong>
+            {{ order?.deliveryAddress?.addressLine1 }}
+            <ng-container *ngIf="order?.deliveryAddress?.addressLine2">
+              , {{ order?.deliveryAddress?.addressLine2 }}
+            </ng-container>
+            <br />
+            {{ order?.deliveryAddress?.city }}, {{ order?.deliveryAddress?.state }}
+            {{ order?.deliveryAddress?.postalCode }}, {{ order?.deliveryAddress?.country }}
+          </strong>
+        </div>
+        <div>
+          <span>Payment</span>
+          <strong>Cash on delivery · ${{ order?.total | number: '1.2-2' }}</strong>
+        </div>
+        <div>
+          <span>Estimated delivery</span>
+          <strong>3–5 business days</strong>
+        </div>
+      </div>
+      <h2 class="confirmed-items-title">Items in this order</h2>
+      <ul class="confirmed-items">
+        <li *ngFor="let item of order?.items">
+          <img [src]="item.productUrl" [alt]="item.name" />
+          <span>{{ item.name }} × {{ item.quantity }}</span>
+          <strong>${{ item.lineTotal | number: '1.2-2' }}</strong>
+        </li>
+      </ul>
+      <div class="confirmation-actions">
+        <a class="place-order-button confirmation-continue" routerLink="/orders">
+          Track my order
+        </a>
+        <button class="confirmation-shop-button" type="button" (click)="continueShopping()">
+          Continue shopping
+        </button>
+      </div>
+    </section>
+  </ng-template>
+</main>

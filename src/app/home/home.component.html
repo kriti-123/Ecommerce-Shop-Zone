@@ -17,7 +17,7 @@
       </div>
     </div>
   </div> -->
-  <div
+  <!-- <div
     id="carouselExampleSlidesOnly"
     class="carousel slide"
     data-bs-ride="carousel"
@@ -45,73 +45,290 @@
         />
       </div>
     </div>
+  </div>-->
+  <section class="home-cover" aria-labelledby="home-title">
+    <video
+      src="../../assets/24718-345209742_small.mp4"
+      autoplay
+      loop
+      muted
+      playsinline
+      class="back-video"
+      aria-hidden="true"
+    ></video>
+    <div class="content">
+      <p class="hero-eyebrow">Good finds, all in one place</p>
+      <h1 id="home-title">Shop<span>Zone</span></h1>
+      <p class="hero-description">
+        Make room for the things you love. Discover everyday favorites and
+        exciting new finds.
+      </p>
+      <a class="hero-cta" href="#shop-categories">
+        Explore collections <span aria-hidden="true">&rarr;</span>
+      </a>
+      <p class="hero-note">Thoughtful picks <span>·</span> Easy shopping <span>·</span> Delivered to you</p>
+    </div>
+  </section>
+  <div id="shop-categories" class="shop-categories">
+    <app-category></app-category>
   </div>
+  <section class="promo-flyer" aria-labelledby="promo-title">
+    <div class="promo-content">
+      <p class="promo-eyebrow">The ShopZone green sale</p>
+      <h2 id="promo-title">Fresh finds.<br /><span>Big savings.</span></h2>
+      <p class="promo-description">
+        Make your next favorite find for less with our latest collection.
+      </p>
+      <a class="promo-cta" href="#latest-arrivals">
+        Shop latest arrivals <span aria-hidden="true">&rarr;</span>
+      </a>
+      <p class="promo-terms">Flat 60% off on selected picks</p>
+    </div>
+    <div class="promo-offer" aria-label="Flat 60 percent off">
+      <span class="promo-offer-label">FLAT</span>
+      <strong>60<span>%</span></strong>
+      <span class="promo-offer-label">OFF</span>
+      <span class="promo-offer-spark" aria-hidden="true">✦</span>
+    </div>
+  </section>
+  <section
+    id="latest-arrivals"
+    class="latest-section"
+    aria-labelledby="latest-title"
+  >
+    <div class="latest-inner">
+      <header class="latest-header">
+        <div>
+          <p class="latest-eyebrow">Just landed</p>
+          <h2 id="latest-title">Latest arrivals</h2>
+          <p class="latest-intro">Take a first look at the newest additions to ShopZone.</p>
+        </div>
+        <span class="latest-count" *ngIf="latestProducts.length">
+          {{ latestProducts.length }} new picks
+        </span>
+      </header>
 
-  <app-category></app-category>
-  <!-- product  -->
-  <h3 style="text-align: center">TrendyProducts</h3>
-  <div class="container p-4">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-      <div *ngFor="let item of productList" class="col hoverEffect">
-        <div class="card h-100 hoverEffect cardSize">
-          <a routerLink="/detail/{{ item.id }}"
-            ><img
-              src="{{ item.productUrl }}"
-              class="card-img-top"
-              alt="{{ item.name }}"
-          /></a>
-          <div class="card-body">
-            <a routerLink="/detail/{{ item.id }}"
-              ><h5 class="card-title">{{ item.name }}</h5></a
-            >
-            <p class="card-text">{{ item.description }}</p>
-            <p class="card-text">
-              <strong>Price: ${{ item.price }}</strong>
-            </p>
-            <div class="card-actions d-flex justify-content-between">
-              <button class="btn btn-light">
-                <i class="fa fa-eye" aria-hidden="true"></i>
-              </button>
-              <button class="btn btn-light">
-                <i class="fa fa-cart-plus" aria-hidden="true"></i>
-              </button>
+      <div class="latest-grid" *ngIf="latestProducts.length; else noLatestProducts">
+        <article class="latest-card" *ngFor="let item of latestProducts">
+          <a
+            class="latest-image-link"
+            [routerLink]="['/detail', item.id]"
+            [attr.aria-label]="'View ' + item.name"
+          >
+            <img [src]="item.productUrl" [alt]="item.name" loading="lazy" />
+            <span class="latest-badge">New arrival</span>
+          </a>
+          <div class="latest-card-content">
+            <p class="latest-category">{{ item.category || 'ShopZone pick' }}</p>
+            <h3>
+              <a [routerLink]="['/detail', item.id]">{{ item.name }}</a>
+            </h3>
+            <p class="latest-description">{{ item.description }}</p>
+            <div class="latest-card-footer">
+              <strong>${{ item.price | number: '1.2-2' }}</strong>
+              <a [routerLink]="['/detail', item.id]">
+                View item <span aria-hidden="true">&rarr;</span>
+              </a>
             </div>
           </div>
-        </div>
+        </article>
       </div>
+
+      <ng-template #noLatestProducts>
+        <p class="latest-empty">New arrivals will appear here when products are available.</p>
+      </ng-template>
     </div>
-  </div>
-  <!-- popular you search-->
-  <h3 style="text-align: center">product you search</h3>
-  <div class="container p-4">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-      <div *ngFor="let item of productList" class="col hoverEffect">
-        <div class="card h-100 hoverEffect cardSize">
-          <a routerLink="/detail/{{ item.id }}"
-            ><img
-              src="{{ item.productUrl }}"
-              class="card-img-top"
-              alt="{{ item.name }}"
-          /></a>
-          <div class="card-body">
-            <h5 class="card-title">{{ item.name }}</h5>
-            <p class="card-text">{{ item.description }}</p>
-            <p class="card-text">
-              <strong>Price: ${{ item.price }}</strong>
-            </p>
-            <div class="card-actions d-flex justify-content-between">
-              <button class="btn btn-light">
-                <i class="fa fa-eye" aria-hidden="true"></i>
-              </button>
-              <button class="btn btn-light">
-                <i class="fa fa-cart-plus" aria-hidden="true"></i>
-              </button>
+  </section>
+  <section class="trendy-section" aria-labelledby="trendy-title">
+    <div class="trendy-inner">
+      <header class="trendy-header">
+        <div>
+          <p class="trendy-eyebrow">Loved by our shoppers</p>
+          <h2 id="trendy-title">Trending right now</h2>
+          <p class="trendy-intro">Discover the products everyone is talking about.</p>
+        </div>
+        <span class="trendy-count" *ngIf="productList?.length">
+          {{ productList?.length }} picks
+        </span>
+      </header>
+
+      <div class="trendy-grid" *ngIf="productList?.length; else noTrendyProducts">
+        <article class="trendy-card" *ngFor="let item of productList">
+          <a
+            class="trendy-image-link"
+            [routerLink]="['/detail', item.id]"
+            [attr.aria-label]="'View ' + item.name"
+          >
+            <img
+              class="trendy-image"
+              [src]="item.productUrl"
+              [alt]="item.name"
+              loading="lazy"
+            />
+            <span class="trendy-badge">Trending</span>
+          </a>
+          <div class="trendy-card-content">
+            <p class="trendy-category">{{ item.category || 'ShopZone pick' }}</p>
+            <h3 class="trendy-name">
+              <a [routerLink]="['/detail', item.id]">{{ item.name }}</a>
+            </h3>
+            <p class="trendy-description">{{ item.description }}</p>
+            <div class="trendy-card-footer">
+              <strong class="trendy-price">${{ item.price | number: '1.2-2' }}</strong>
+              <a class="trendy-view-link" [routerLink]="['/detail', item.id]">
+                View item <span aria-hidden="true">&rarr;</span>
+              </a>
             </div>
           </div>
-        </div>
+        </article>
       </div>
+
+      <ng-template #noTrendyProducts>
+        <p class="trendy-empty">Trending products will appear here when available.</p>
+      </ng-template>
     </div>
-  </div>
+  </section>
+  <div><app-top-deals></app-top-deals></div>
+  <section class="search-products-section" aria-labelledby="search-products-title">
+    <div class="search-products-inner">
+      <header class="search-products-header">
+        <div>
+          <p class="search-products-eyebrow">A little more to explore</p>
+          <h2 id="search-products-title">Products you may like</h2>
+          <p class="search-products-intro">
+            Find something new from our latest collection.
+          </p>
+        </div>
+        <span class="search-products-count" *ngIf="productList?.length">
+          {{ productList?.length }} products
+        </span>
+      </header>
+
+      <div class="search-products-grid" *ngIf="productList?.length; else noProducts">
+        <article class="search-product-card" *ngFor="let item of productList">
+          <a
+            class="search-product-image-link"
+            [routerLink]="['/detail', item.id]"
+            [attr.aria-label]="'View ' + item.name"
+          >
+            <img
+              class="search-product-image"
+              [src]="item.productUrl"
+              [alt]="item.name"
+              loading="lazy"
+            />
+            <span class="search-product-category">{{ item.category }}</span>
+          </a>
+          <div class="search-product-info">
+            <h3 class="search-product-name">{{ item.name }}</h3>
+            <p class="search-product-description">{{ item.description }}</p>
+            <div class="search-product-footer">
+              <span class="search-product-price">${{ item.price }}</span>
+              <a
+                class="search-product-link"
+                [routerLink]="['/detail', item.id]"
+                [attr.aria-label]="'View details for ' + item.name"
+              >
+                View product <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #noProducts>
+        <div class="search-products-grid">
+          <article class="search-product-card">
+            <div class="search-product-image-link">
+              <img
+                class="search-product-image"
+                src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                alt="Red running sneaker"
+                loading="lazy"
+              />
+              <span class="search-product-category">Footwear</span>
+            </div>
+            <div class="search-product-info">
+              <h3 class="search-product-name">Everyday Runner</h3>
+              <p class="search-product-description">
+                A comfortable, colorful pick for wherever the day takes you.
+              </p>
+              <div class="search-product-footer">
+                <span class="search-product-price">$49.99</span>
+                <span class="search-product-link">Explore item &rarr;</span>
+              </div>
+            </div>
+          </article>
+          <article class="search-product-card">
+            <div class="search-product-image-link">
+              <img
+                class="search-product-image"
+                src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                alt="Minimal wristwatch"
+                loading="lazy"
+              />
+              <span class="search-product-category">Accessories</span>
+            </div>
+            <div class="search-product-info">
+              <h3 class="search-product-name">Classic Watch</h3>
+              <p class="search-product-description">
+                A timeless everyday accessory with a clean, modern look.
+              </p>
+              <div class="search-product-footer">
+                <span class="search-product-price">$79.00</span>
+                <span class="search-product-link">Explore item &rarr;</span>
+              </div>
+            </div>
+          </article>
+          <article class="search-product-card">
+            <div class="search-product-image-link">
+              <img
+                class="search-product-image"
+                src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                alt="Over-ear headphones"
+                loading="lazy"
+              />
+              <span class="search-product-category">Electronics</span>
+            </div>
+            <div class="search-product-info">
+              <h3 class="search-product-name">Studio Headphones</h3>
+              <p class="search-product-description">
+                Settle in with comfortable headphones for music on the go.
+              </p>
+              <div class="search-product-footer">
+                <span class="search-product-price">$59.50</span>
+                <span class="search-product-link">Explore item &rarr;</span>
+              </div>
+            </div>
+          </article>
+          <article class="search-product-card">
+            <div class="search-product-image-link">
+              <img
+                class="search-product-image"
+                src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                alt="Vintage-style camera"
+                loading="lazy"
+              />
+              <span class="search-product-category">Photography</span>
+            </div>
+            <div class="search-product-info">
+              <h3 class="search-product-name">Pocket Camera</h3>
+              <p class="search-product-description">
+                Capture everyday moments with this compact camera pick.
+              </p>
+              <div class="search-product-footer">
+                <span class="search-product-price">$99.00</span>
+                <span class="search-product-link">Explore item &rarr;</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <div class="footer" data-aos="fade-in"><app-footer></app-footer></div>
+  <!-- <app-footer></app-footer> -->
 </body>
 
 <!-- <app-seller-home></app-seller-home> -->

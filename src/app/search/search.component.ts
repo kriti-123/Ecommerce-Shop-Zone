@@ -2,23 +2,45 @@ import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../services/product.service';
 import { ActivatedRoute } from '@angular/router';
 import { product } from '../data-type';
+import { EMPTY, catchError, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrl: './search.component.css',
 })
 export class SearchComponent implements OnInit {
-  searchResult: undefined | product[];
+  searchResult: product[] = [];
+  query = '';
+  loading = true;
+  loadError = false;
+
   constructor(
     private productService: ProductService,
     private activeRoute: ActivatedRoute
   ) {}
+
   ngOnInit(): void {
-    let query = this.activeRoute.snapshot.paramMap.get('query');
-    query &&
-      this.productService.searchProduct(query).subscribe((result) => {
+    this.activeRoute.paramMap
+      .pipe(
+        switchMap((params) => {
+          this.query = params.get('query')?.trim() ?? '';
+          this.loading = !!this.query;
+          this.loadError = false;
+          return this.query
+            ? this.productService.searchProduct(this.query).pipe(
+                catchError(() => {
+                  this.loading = false;
+                  this.loadError = true;
+                  this.searchResult = [];
+                  return EMPTY;
+                })
+              )
+            : of([]);
+        })
+      )
+      .subscribe((result) => {
         this.searchResult = result;
+        this.loading = false;
       });
   }
 }

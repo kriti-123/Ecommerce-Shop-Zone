@@ -26,24 +26,29 @@
             "outputPath": "dist/project-ecom",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
               "src/styles.css",
-              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+              "src/app/category-products/category-products.component.css",
+              "src/app/search/search.component.css",
+              "src/app/home/trendy-products.css",
+              "src/app/seller-home/seller-home-page.css",
+              "src/app/checkout/checkout-page.css",
+              "src/app/orders/orders-page.css",
+              "src/app/profile/profile-page.css",
+              "src/app/product-detail/product-detail-page.css",
+              "src/app/footer/footer-page.css",
+              "src/app/auth-page.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/aos/dist/aos.css"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.slim.min.js",
               "node_modules/@popperjs/core/dist/umd/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
-            
           },
           "configurations": {
             "production": {
@@ -90,18 +95,10 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.css"],
             "scripts": []
           }
         }

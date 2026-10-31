@@ -225,7 +225,26 @@
       "seller": "kriti",
       "color": "blue",
       "id": 12
+    },
+     {
+      "name": "Mac Book",
+      "description": "Laptop",
+      "price": 200000,
+      "productUrl": "https://www.digitaltrends.com/wp-content/uploads/2023/02/macbook-pro-14-m2-max.jpg?p=1",
+      "seller": "kriti",
+      "color": "black",
+      "id": 13
+    },
+    {
+      "name": "Mac Book",
+      "description": "Laptop",
+      "price": 200000,
+      "productUrl": "https://www.digitaltrends.com/wp-content/uploads/2023/02/macbook-pro-14-m2-max.jpg?p=1",
+      "seller": "kriti",
+      "color": "black",
+      "id": 14
     }
+    
   ],
   "user": [
     {

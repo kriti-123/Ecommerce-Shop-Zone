@@ -1,30 +1,216 @@
-<!-- index.html -->
-<div class="container">
-  <h2>Add Product</h2>
-  <form
-    class="add-product-form"
-    id="productForm"
-    #addProduct="ngForm"
-    (ngSubmit)="onAddProduct(addProduct.value)"
-  >
-    <label for="name">Product Name:</label>
-    <input type="text" id="name" name="name" ngModel required />
+<main class="seller-product-page">
+  <section class="product-editor">
+    <a class="back-to-inventory" routerLink="/seller-home">
+      <span aria-hidden="true">←</span> Back to inventory
+    </a>
 
-    <label for="description">Product Description:</label>
-    <textarea id="description" name="description" ngModel required></textarea>
+    <header class="editor-header">
+      <p class="editor-eyebrow">Seller workspace</p>
+      <h1>{{ editingId ? 'Edit product' : 'Add a product' }}</h1>
+      <p>
+        Add clear product details and keep your available stock up to date.
+      </p>
+    </header>
 
-    <label for="price">Product Price:</label>
-    <input type="number" id="price" name="price" ngModel required />
+    <p *ngIf="loadingProduct" class="editor-state" role="status">
+      Loading product details…
+    </p>
+    <form
+      *ngIf="!loadingProduct"
+      class="product-editor-form"
+      #productForm="ngForm"
+      (ngSubmit)="saveProduct()"
+    >
+      <div class="editor-fields">
+        <label class="editor-field editor-field-wide">
+          <span>Product name</span>
+          <input
+            type="text"
+            name="name"
+            [(ngModel)]="productDraft.name"
+            minlength="2"
+            maxlength="160"
+            placeholder="e.g. Wireless headphones"
+            required
+          />
+        </label>
 
-    <label for="proUrl">Product url</label>
-    <input type="text" id="proUrl" name="productUrl" ngModel required />
+        <label class="editor-field">
+          <span>Category</span>
+          <select
+            name="category"
+            [(ngModel)]="productDraft.category"
+            (ngModelChange)="onCategoryChange()"
+            required
+          >
+            <option value="" disabled>Select a category</option>
+            <option *ngFor="let category of categories" [value]="category.name">
+              {{ category.name }}
+            </option>
+          </select>
+        </label>
 
-    <label for="seller">Seller:</label>
-    <input type="text" id="seller" name="seller" ngModel required />
+        <label class="editor-field">
+          <span>Subcategory</span>
+          <select
+            name="subcategory"
+            [(ngModel)]="productDraft.subcategory"
+            [disabled]="!selectedSubcategories.length"
+          >
+            <option value="">Select a subcategory</option>
+            <option
+              *ngFor="let subcategory of selectedSubcategories"
+              [value]="subcategory"
+            >
+              {{ subcategory }}
+            </option>
+          </select>
+        </label>
 
-    <label for="color">color:</label>
-    <input type="text" id="color" name="color" ngModel required />
+        <label class="editor-field">
+          <span>Price (USD)</span>
+          <div class="input-with-prefix">
+            <span>$</span>
+            <input
+              type="number"
+              name="price"
+              [(ngModel)]="productDraft.price"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+        </label>
 
-    <button type="submit">Add Product</button>
-  </form>
-</div>
+        <label class="editor-field">
+          <span>Original price (USD) <em>Optional, before discount</em></span>
+          <div class="input-with-prefix">
+            <span>$</span>
+            <input
+              type="number"
+              name="originalPrice"
+              [(ngModel)]="productDraft.originalPrice"
+              min="0.01"
+              step="0.01"
+            />
+          </div>
+          <small>
+            When lowering the selling price, leaving this blank uses the current
+            price as the original price automatically.
+          </small>
+          <small *ngIf="discountPercentage !== null">
+            Discount: {{ discountPercentage | number: '1.0-1' }}%
+            <ng-container *ngIf="discountPercentage >= 20">
+              · Eligible for Top Deals when in stock and active
+            </ng-container>
+            <ng-container *ngIf="discountPercentage < 20">
+              · Top Deals requires at least 20%
+            </ng-container>
+          </small>
+          <small *ngIf="productDraft.originalPrice !== null && discountPercentage === null">
+            The product needs an original price higher than its selling price to qualify.
+          </small>
+        </label>
+
+        <label class="editor-field">
+          <span>Available quantity</span>
+          <input
+            type="number"
+            name="stockQuantity"
+            [(ngModel)]="productDraft.stockQuantity"
+            min="0"
+            max="100000"
+            step="1"
+            required
+          />
+          <small>Set to 0 to mark the item as out of stock.</small>
+        </label>
+
+        <label class="editor-field editor-active-field">
+          <input
+            type="checkbox"
+            name="isActive"
+            [(ngModel)]="productDraft.isActive"
+          />
+          <span>Product is active and visible in Top Deals when eligible</span>
+        </label>
+
+        <label class="editor-field editor-field-wide">
+          <span>Description</span>
+          <textarea
+            name="description"
+            [(ngModel)]="productDraft.description"
+            maxlength="5000"
+            rows="5"
+            placeholder="Describe the product and its key features"
+            required
+          ></textarea>
+        </label>
+
+        <label class="editor-field">
+          <span>Color</span>
+          <input
+            type="text"
+            name="color"
+            [(ngModel)]="productDraft.color"
+            maxlength="60"
+            placeholder="e.g. Matte black"
+            required
+          />
+        </label>
+
+        <label class="editor-field">
+          <span>Product image</span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif,image/avif,.avif"
+            (change)="onImageSelected($event)"
+            [required]="!productDraft.productUrl"
+          />
+          <small>Upload a JPEG, PNG, WebP, GIF or AVIF image up to 1 MB, or use an image URL below.</small>
+        </label>
+
+        <label class="editor-field editor-field-wide">
+          <span>Image URL</span>
+          <input
+            type="text"
+            name="productUrl"
+            [(ngModel)]="productDraft.productUrl"
+            (ngModelChange)="imagePreview = $event"
+            placeholder="https://example.com/product-image.jpg"
+            required
+          />
+        </label>
+      </div>
+
+      <div class="image-preview" *ngIf="imagePreview">
+        <img [src]="imagePreview" alt="Product image preview" />
+        <div>
+          <strong>Image preview</strong>
+          <span>This is how the product image will appear in the shop.</span>
+        </div>
+      </div>
+
+      <p *ngIf="errorMessage" class="editor-error" role="alert">
+        {{ errorMessage }}
+      </p>
+
+      <footer class="editor-actions">
+        <a class="editor-cancel" routerLink="/seller-home">Cancel</a>
+        <button
+          class="editor-submit"
+          type="submit"
+          [disabled]="productForm.invalid || saving || !productDraft.productUrl"
+        >
+          {{
+            saving
+              ? 'Saving…'
+              : editingId
+                ? 'Save changes'
+                : 'Publish product'
+          }}
+        </button>
+      </footer>
+    </form>
+  </section>
+</main>

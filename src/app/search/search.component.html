@@ -1,35 +1,70 @@
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-/>
+<main class="all-search-page">
+  <div class="all-search-inner">
+    <header class="all-search-header">
+      <div>
+        <p class="all-search-eyebrow">SHOPZONE SEARCH</p>
+        <h1>Search results</h1>
+        <p class="all-search-summary" *ngIf="query">
+          Results for <strong>“{{ query }}”</strong>
+        </p>
+      </div>
+      <p
+        class="all-search-count"
+        *ngIf="!loading && !loadError && searchResult.length"
+      >
+        {{ searchResult.length }} products found
+      </p>
+    </header>
 
-<div class="container p-4">
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-    <div *ngFor="let item of searchResult" class="col hoverEffect">
-      <div class="card h-100 hoverEffect cardSize">
-        <a routerLink="/detail/{{ item.id }}">
-          <img
-            src="{{ item.productUrl }}"
-            class="card-img-top"
-            alt="{{ item.name }}"
-          />
+    <p class="all-search-state" *ngIf="loading" aria-live="polite">
+      Searching all products…
+    </p>
+
+    <section
+      class="all-search-state all-search-error"
+      *ngIf="!loading && loadError"
+    >
+      <h2>Search is temporarily unavailable</h2>
+      <p>Check that the product service is running, then try your search again.</p>
+    </section>
+
+    <section
+      class="all-search-grid"
+      *ngIf="!loading && !loadError && searchResult.length"
+      aria-label="All matching products"
+    >
+      <article class="all-search-card" *ngFor="let item of searchResult">
+        <a
+          class="all-search-image"
+          [routerLink]="['/detail', item.id]"
+          [attr.aria-label]="'View ' + item.name"
+        >
+          <img [src]="item.productUrl" [alt]="item.name" loading="lazy" />
         </a>
-        <div class="card-body">
-          <h5 class="card-title">{{ item.name }}</h5>
-          <p class="card-text">{{ item.description }}</p>
-          <p class="card-text">
-            <strong>Price: ${{ item.price }}</strong>
-          </p>
-          <div class="card-actions d-flex justify-content-between">
-            <button class="btn btn-light">
-              <i class="fa fa-eye" aria-hidden="true"></i>
-            </button>
-            <button class="btn btn-light">
-              <i class="fa fa-cart-plus" aria-hidden="true"></i>
-            </button>
+        <div class="all-search-info">
+          <p class="all-search-category">{{ item.category || 'Product' }}</p>
+          <h2><a [routerLink]="['/detail', item.id]">{{ item.name }}</a></h2>
+          <p class="all-search-description">{{ item.description }}</p>
+          <div class="all-search-footer">
+            <strong>${{ item.price | number: '1.2-2' }}</strong>
+            <a class="all-search-link" [routerLink]="['/detail', item.id]">
+              View product <span aria-hidden="true">&rarr;</span>
+            </a>
           </div>
         </div>
-      </div>
-    </div>
+      </article>
+    </section>
+
+    <section
+      class="all-search-state"
+      *ngIf="!loading && !loadError && !searchResult.length"
+    >
+      <h2>No products found</h2>
+      <p>
+        We couldn’t find products matching “{{ query }}”. Try another product
+        name, category, brand, color or keyword.
+      </p>
+      <a routerLink="/">Continue shopping</a>
+    </section>
   </div>
-</div>
+</main>

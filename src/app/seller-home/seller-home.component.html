@@ -1,25 +1,174 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-<div class="container p-4">
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-    <div *ngFor="let item of productListArr" class="col hoverEffect ">
-      <div class="card h-100 hoverEffect cardSize ">
-        <img src="{{ item.productUrl }}" class="card-img-top " alt="{{ item.name }}">
-        <div class="card-body">
-          <h5 class="card-title">{{ item.name }}</h5>
-          <p class="card-text">{{ item.description }}</p>
-          <p class="card-text"><strong>Price: ${{ item.price }}</strong></p>
-          <div class="card-actions d-flex justify-content-between">
-            <button class="btn btn-light"(click)="deleteProduct(item.id)">
-              <i class="fa fa-trash" aria-hidden="true"></i>
-            </button>
-            <button class="btn btn-light" >
-              <i class="fa fa-pencil"></i>
-            </button>
-          </div>
-        </div>
-        
-      </div>
+<main class="seller-dashboard">
+  <header class="seller-dashboard-header">
+    <div>
+      <p class="seller-eyebrow">Seller workspace</p>
+      <h1>Inventory dashboard</h1>
+      <p class="seller-intro">
+        Manage your listings, pricing and stock from one place.
+      </p>
     </div>
-  </div>
-</div>
+    <a class="seller-primary-action" routerLink="/seller-add-product">
+      <span aria-hidden="true">+</span>
+      Add a product
+    </a>
+  </header>
+
+  <section class="seller-stats" aria-label="Inventory summary">
+    <article class="seller-stat">
+      <span class="seller-stat-icon" aria-hidden="true">▦</span>
+      <div>
+        <p>Active listings</p>
+        <strong>{{ productListArr.length }}</strong>
+      </div>
+    </article>
+    <article class="seller-stat">
+      <span class="seller-stat-icon" aria-hidden="true">▤</span>
+      <div>
+        <p>Units in stock</p>
+        <strong>{{ totalStock }}</strong>
+      </div>
+    </article>
+    <article class="seller-stat seller-stat-warning">
+      <span class="seller-stat-icon" aria-hidden="true">!</span>
+      <div>
+        <p>Low stock</p>
+        <strong>{{ lowStockCount }}</strong>
+      </div>
+    </article>
+    <article class="seller-stat seller-stat-empty">
+      <span class="seller-stat-icon" aria-hidden="true">−</span>
+      <div>
+        <p>Out of stock</p>
+        <strong>{{ outOfStockCount }}</strong>
+      </div>
+    </article>
+  </section>
+
+  <section class="seller-inventory" aria-labelledby="inventory-title">
+    <div class="inventory-toolbar">
+      <div>
+        <h2 id="inventory-title">Your products</h2>
+        <p>Update listings and keep stock information current.</p>
+      </div>
+      <label class="inventory-search">
+        <span class="visually-hidden">Search your products</span>
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          [(ngModel)]="searchTerm"
+          placeholder="Search products"
+          autocomplete="off"
+        />
+      </label>
+    </div>
+
+    <p *ngIf="loadError" class="seller-alert" role="alert">{{ loadError }}</p>
+    <button
+      *ngIf="loadError && !loading"
+      class="seller-secondary-action"
+      type="button"
+      (click)="loadProducts()"
+    >
+      Try again
+    </button>
+    <div *ngIf="loading" class="seller-state" role="status">
+      Loading your inventory…
+    </div>
+    <div *ngIf="!loading && !loadError && productListArr.length === 0" class="seller-state">
+      <h3>Your inventory is ready for its first product</h3>
+      <p>Add a listing to start showing it to ShopZone shoppers.</p>
+      <a class="seller-primary-action" routerLink="/seller-add-product">Add your first product</a>
+    </div>
+    <div
+      *ngIf="!loading && !loadError && productListArr.length > 0 && filteredProducts.length === 0"
+      class="seller-state"
+    >
+      No products match “{{ searchTerm }}”.
+    </div>
+
+    <div class="inventory-table-wrap" *ngIf="!loading && filteredProducts.length">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Category</th>
+            <th scope="col">Price / deal</th>
+            <th scope="col">Available stock</th>
+            <th scope="col">Status</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredProducts">
+            <td>
+              <div class="inventory-product">
+                <img [src]="item.productUrl" [alt]="item.name" />
+                <div>
+                  <strong>{{ item.name }}</strong>
+                  <span>{{ item.color }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span>{{ item.category }}</span>
+              <small *ngIf="item.subcategory">{{ item.subcategory }}</small>
+            </td>
+            <td class="inventory-price">
+              <strong>${{ item.price | number: '1.2-2' }}</strong>
+              <del *ngIf="item.originalPrice">
+                ${{ item.originalPrice | number: '1.2-2' }}
+              </del>
+              <small *ngIf="isTopDeal(item)" class="inventory-deal-label">
+                {{ discountPercentage(item) | number: '1.0-0' }}% Top Deal
+              </small>
+            </td>
+            <td>{{ item.stockQuantity ?? 0 }}</td>
+            <td>
+              <span *ngIf="item.isActive === false; else inventoryStatus"
+                class="stock-status stock-status-out">
+                Inactive
+              </span>
+              <ng-template #inventoryStatus>
+                <span
+                class="stock-status"
+                [class.stock-status-out]="(item.stockQuantity ?? 0) === 0"
+                [class.stock-status-low]="
+                  (item.stockQuantity ?? 0) > 0 && (item.stockQuantity ?? 0) <= 5
+                "
+                >
+                  {{
+                    (item.stockQuantity ?? 0) === 0
+                      ? 'Out of stock'
+                      : (item.stockQuantity ?? 0) <= 5
+                        ? 'Low stock'
+                        : 'In stock'
+                  }}
+                </span>
+              </ng-template>
+            </td>
+            <td>
+              <div class="inventory-actions">
+                <button
+                  class="seller-secondary-action"
+                  type="button"
+                  (click)="editProduct(item)"
+                >
+                  Edit
+                </button>
+                <button
+                  class="seller-delete-action"
+                  type="button"
+                  [disabled]="deletingId !== null"
+                  (click)="deleteProduct(item)"
+                  [attr.aria-label]="'Delete ' + item.name"
+                >
+                  {{ deletingId === item.id ? 'Deleting…' : 'Delete' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
